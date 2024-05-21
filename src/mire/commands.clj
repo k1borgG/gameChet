@@ -1,7 +1,8 @@
 (ns mire.commands
   (:require [clojure.string :as str]
             [mire.rooms :as rooms]
-            [mire.player :as player]))
+            [mire.player :as player]
+            [mire.logging :as logging]))
 
 (defn- move-between-refs
   "Move one instance of obj between from and to. Must call in a transaction."
@@ -90,6 +91,18 @@
                       (dissoc (ns-publics 'mire.commands)
                               'execute 'commands))))
 
+(defn log-player-command
+  "Logs the player's name."
+  []
+  (logging/log-player player/*name*)
+  (str "Player " player/*name* " has been logged."))
+
+(defn show-logged-players
+  "Shows the logged players."
+  []
+  (str "Logged players:\n" 
+        (str/join "\n" (logging/get-logged-players))))
+
 ;; Command data
 
 (def commands {"move" move,
@@ -103,7 +116,9 @@
                "detect" detect
                "look" look
                "say" say
-               "help" help})
+               "help" help
+               "logme" log-player-command
+               "showlogs" show-logged-players})
 
 ;; Command handling
 
