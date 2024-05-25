@@ -1,5 +1,4 @@
 :- use_module(library(socket)).
-
 :- dynamic exit/1.
 
 
@@ -49,9 +48,14 @@ loop(Stream) :-
   process(Stream),
   loop(Stream).
  
- main :-
-   setup_call_cleanup(
-     tcp_connect(localhost:3333, Stream, []),
-     loop(Stream),
-     close(Stream)).
-     
+  main :-
+      setup_call_cleanup(
+          tcp_connect(localhost:3333, Stream, []),  % Setup
+          (
+              format(atom(Username), '~w~n', ['your_username']),
+              write(Stream, Username),
+              flush_output(Stream),
+              loop(Stream) % Call
+          ),
+          close(Stream)  % Cleanup
+      ).
