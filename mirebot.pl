@@ -26,12 +26,13 @@ filter_codes([H|T1], [F|T2]) :-
 
 
 process(Stream) :-
-  exit([Direction|_]),
-  format(atom(Command), 'move ~w~n', [Direction]),
+  (exit([Direction|_]) ; Direction = logme), % Если направление не задано, то отправляем logme
+  format(atom(Command), '~w~n', [Direction]),
   write(Command),
   write(Stream, Command),
   flush_output(Stream),
-  retractall(exit(_)).
+  retractall(exit(_)),
+  (Direction \= logme). % Проверяем, не была ли отправлена команда logme
 
 process(_).
 
@@ -52,7 +53,7 @@ loop(Stream) :-
       setup_call_cleanup(
           tcp_connect(localhost:3333, Stream, []),  % Setup
           (
-              format(atom(Username), '~w~n', ['your_username']),
+              format(atom(Username), '~w~n', ['botik']),
               write(Stream, Username),
               flush_output(Stream),
               loop(Stream) % Call
